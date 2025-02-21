@@ -1,0 +1,22 @@
+{% for chat in chats %}
+<div class="chat-item">
+    <div class="avatar"></div>
+    <div class="chat-info">
+        <h4></h4>
+        <p>Última mensagem recebida...</p>
+    </div>
+    <div class="chat-meta">
+        <span>15:30</span>
+        <div class="unread-count">2</div>
+    </div>
+</div>
+{% empty %}
+<div style="width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: gray;">
+    <p>Comece um chat...</p>
+</div>
+{% endfor %}

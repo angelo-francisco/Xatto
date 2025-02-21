@@ -1,0 +1,46 @@
+{% if not msg or type == "empty" %}
+<small class="feedback" style="color: gray;">
+    Write the username that you want to reach
+</small>
+<button class="btn-stay" disabled>Go</button>
+
+{% elif type == "error" %}
+<small class="feedback error">
+    <svg width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#F87171" stroke-width="6" />
+        <line x1="30" y1="30" x2="70" y2="70" stroke="#F87171" stroke-width="6" stroke-linecap="round">
+            <animate attributeName="x2" from="30" to="70" dur="0.3s" fill="freeze" />
+            <animate attributeName="y2" from="30" to="70" dur="0.3s" fill="freeze" />
+        </line>
+        <line x1="70" y1="30" x2="30" y2="70" stroke="#F87171" stroke-width="6" stroke-linecap="round">
+            <animate attributeName="x2" from="70" to="30" dur="0.3s" fill="freeze" />
+            <animate attributeName="y2" from="30" to="70" dur="0.3s" fill="freeze" />
+        </line>
+    </svg>
+    {{ msg }}
+</small>
+<button class="btn-stay" disabled>Go</button>
+
+{% else %}
+<small class="feedback success">
+    <svg width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#4ADE80" stroke-width="6" />
+        <path d="M30 50 L45 65 L70 35" fill="none" stroke="#4ADE80" stroke-width="6" stroke-linecap="round"
+            stroke-linejoin="round">
+            <animate attributeName="d" from="M30 50 L30 50 L30 50" to="M30 50 L45 65 L70 35" dur="0.3s" fill="freeze" />
+        </path>
+    </svg>
+    {{ msg }}
+</small>
+<button class="btn-go" id="js-btn-go" hx-get="{% url 'create-room' %}?is_private=1&other_user={{ user_slug }}"
+    hx-trigger="click" hx-target="#main-section" hx-swap="innerHTML"
+    hx-on:click="triggerChatListUpdate()">Go</button>
+
+<script>
+    function triggerChatListUpdate() {
+        const event = new CustomEvent('listenForChatListUpdate');
+        document.body.dispatchEvent(event);
+    }
+</script>
+
+{% endif %}

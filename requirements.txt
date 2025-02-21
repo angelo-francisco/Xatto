@@ -1,0 +1,6 @@
+django
+channels
+channels-redis
+daphne
+taskipy
+pillow

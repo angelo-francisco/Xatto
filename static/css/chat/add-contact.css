@@ -1,0 +1,105 @@
+#add-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 5px;
+    background-color: white;
+    padding: 20px;
+}
+
+#add-container p {
+    font-weight: 600;
+    font-size: 20px;
+}
+
+#add-container button {
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #25D366;
+    color: white;
+}
+
+.container {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.search-container {
+    width: 300px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus {
+    border-color: #229d4f;
+}
+
+.icon {
+    color: #888;
+}
+
+.helptext {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.feedback {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+.feedback.error {
+    color: #F87171;
+}
+
+.feedback.success {
+    color: #4ADE80;
+}
+
+.btn-go {
+    margin-top: 10px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    background-color: #229d4f;
+    transition: all 0.2s;
+}
+
+.btn-go:disabled {
+    background-color: #0d361c;
+    cursor: not-allowed;
+}
+
+.btn-go:not(:disabled):hover {
+    background-color: #1e6b3d;
+    transform: translateY(-2px);
+}
