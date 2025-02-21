@@ -1,0 +1,4 @@
+*.lock
+db.sqlite3
+pyproject.toml
+media
