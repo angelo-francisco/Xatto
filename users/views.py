@@ -2,11 +2,13 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as dj_login
 from django.contrib.auth import logout as dj_logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
 from .forms import SignupForm
+
+User = get_user_model()
 
 
 def can_not_be_logged(func):
@@ -36,7 +38,7 @@ def signup(request):
 
     if request.method == "POST":
         form = SignupForm(request.POST)
-        print(form.errors)
+        
         if form.is_valid():
             form.save()
             return redirect("login")
@@ -52,9 +54,9 @@ def login(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-        
+
         user = authenticate(request, username=email, password=password)
-        
+
         if user is not None:
             dj_login(request, user)
             return redirect("home")

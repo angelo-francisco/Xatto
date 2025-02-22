@@ -1,11 +1,229 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    room: {{ slug }}
-</body>
-</html>
+<div class="chat-app">
+    <div class="chat-header">
+        {% if not chat.is_private %}
+        <img src="{{ chat.image.url }}" alt="Foto de perfil" class="profile-pic">
+        {% else %}
+        {% for member in chat.participants.all %}
+        {% if member != request.user %}
+        <img src="{{ member.photo.url }}" alt="Foto de perfil" class="profile-pic">
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        <div class="user-info">
+            {% if not chat.is_private %}
+            <img src="{{ chat.image.url }}" alt="Foto de perfil" class="profile-pic">
+            {% else %}
+            {% for member in chat.participants.all %}
+            {% if member != request.user %}
+            <span class="username">{{ member.username }}</span>
+            <span class="status">{{ member.get_status_display }}</span>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="chat-messages">
+        {% for msg in messages   %}
+            {% if msg.sender.username == request.user.username %}
+            <div class="chat-message user-message">
+                <p>{{ msg.content }}</p>
+                <span class="message-time">10:00</span>
+            </div>
+            {% else %}
+            <div class="chat-message other-message">
+                <p>{{ msg.content }}</p>
+                <span class="message-time">10:01</span>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="chat-input">
+        <input type="text" placeholder="Digite sua mensagem..." id="chat-message-input">
+        <button id="js-chat-input-button">Enviar</button>
+    </div>
+</div>
+
+<script>
+    const ws2 = new WebSocket('ws://127.0.0.1:8000/chat/chat-consumer/{{ chat.slug }}/{{ user_slug }}/');
+
+    const chatMessageInput = document.querySelector('#chat-message-input');
+    const sendButton = document.querySelector('#js-chat-input-button');
+    const chatMessages = document.querySelector(".chat-messages")
+
+    function sendMessage() {
+        let content = chatMessageInput.value.trim();
+        if (!content) {
+            alert("A mensagem não pode estar vazia!");
+            return;
+        }
+
+        if (ws2.readyState === WebSocket.OPEN) {
+            ws2.send(JSON.stringify({
+                "content": content
+            }));
+
+            chatMessageInput.value = '';
+        } else {
+            console.error("WebSocket não está conectado.");
+            alert("Erro: Conexão WebSocket não está aberta.");
+        }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+
+    chatMessageInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    ws2.onerror = (error) => {
+        console.error("Erro no WebSocket:", error);
+        alert("Erro na conexão WebSocket. Tente novamente.");
+    };
+
+    ws2.onmessage = (event) => {
+        let { content, timestamp, sender } = JSON.parse(event.data);
+
+        const timePart = timestamp.split('T')[1];
+        const hourAndMinute = timePart.slice(0, 5);
+
+        if (sender === "{{ request.user.username }}") {
+            chatMessages.innerHTML += `
+            <div class="chat-message user-message">
+                <p>${content}</p>
+                <span class="message-time">${hourAndMinute}</span>
+            </div>
+        `
+        } else {
+            chatMessages.innerHTML += `
+            <div class="chat-message other-message">
+                <p>${content}</p>
+                <span class="message-time">${timestamp}</span>
+            </div>
+        `
+
+        }
+    };
+</script>
+
+<style>
+    .chat-app {
+        width: 100%;
+        background-color: #f0f0f0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+    }
+    .chat-header {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: rgb(255, 255, 255);
+        box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.2);
+    }
+    .profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .username {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    .status {
+        font-size: 0.8em;
+        color: #e0e0e0;
+    }
+    .chat-messages {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        background-color: #e5ddd5;
+        background-size: cover;
+    }
+
+    .chat-message {
+        max-width: 80%;
+        width: fit-content;
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 7.5px;
+        position: relative;
+        word-wrap: break-word;
+        font-size: 0.99em;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-message {
+        background-color: #dcf8c6;
+        color: #000;
+        align-self: flex-start;
+        margin-left: auto;
+        border-bottom-right-radius: 0;
+    }
+
+    .other-message {
+        background-color: #ffffff;
+        color: #000;
+        align-self: flex-start;
+        border-bottom-left-radius: 0;
+    }
+
+    .message-time {
+        display: block;
+        font-size: 0.75em;
+        color: #666;
+        margin-top: 4px;
+        text-align: right;
+    }
+
+    .user-message .message-time {
+        color: #4CAF50;
+    }
+
+    .other-message .message-time {
+        color: #666;
+    }
+
+    /* Campo de input */
+    .chat-input {
+        display: flex;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .chat-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        margin-right: 10px;
+        outline: none;
+        font-size: 0.9em;
+    }
+
+    .chat-input button {
+        padding: 10px 20px;
+        background-color: #075e54;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+
+    .chat-input button:hover {
+        background-color: #054d43;
+    }
+</style>

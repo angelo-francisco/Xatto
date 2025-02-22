@@ -32,15 +32,13 @@
     </svg>
     {{ msg }}
 </small>
-<button class="btn-go" id="js-btn-go" hx-get="{% url 'create-room' %}?is_private=1&other_user={{ user_slug }}"
-    hx-trigger="click" hx-target="#main-section" hx-swap="innerHTML"
-    hx-on:click="triggerChatListUpdate()">Go</button>
-
-<script>
-    function triggerChatListUpdate() {
-        const event = new CustomEvent('listenForChatListUpdate');
-        document.body.dispatchEvent(event);
-    }
-</script>
-
+<button class="btn-go" 
+    id="js-btn-go"
+    hx-get="{% url 'create-room' %}?is_private=1&other_user={{ user_slug }}"
+    hx-trigger="click" 
+    hx-target="#main-section" 
+    hx-swap="innerHTML"
+    hx-on:click="document.body.dispatchEvent(new CustomEvent('listenForChatListUpdate'));"
+>
+    Go</button>
 {% endif %}

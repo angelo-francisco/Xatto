@@ -79,23 +79,106 @@
                     </svg>
                 </div>
             </div>
-
-            <div class="chat-list" 
-                hx-get="{% url 'chat-list' %}"
-                hx-trigger="listenForChatListUpdate from:body"
-                hx-target="this"
-                hx-swap="innerHTML"
-            >
+            <div class="chat-list" hx-get="{% url 'chat-list' %}" hx-trigger="listenForChatListUpdate from:body"
+                hx-target="this" hx-swap="innerHTML">
                 {% include 'partials/chat-list.html' %}
             </div>
         </section>
-
         <section class="main-chat-area" id="main-section">
             {% include 'partials/chat_area.html' %}
         </section>
     </main>
 
-    <script src="{% static 'js/chat/home.js' %}"></script>
+    <script>
+        const slug = document.querySelector("meta[name='user-slug']").getAttribute('content')
+        const loader = document.querySelector('#loader')
+
+        function formatDate(lastSeenStr) {
+            const lastSeen = new Date(lastSeenStr);
+            const now = new Date();
+
+            const hours = lastSeen.getHours().toString().padStart(2, '0');
+            const minutes = lastSeen.getMinutes().toString().padStart(2, '0');
+            const timeStr = `${hours}:${minutes}`;
+
+            if (
+                lastSeen.getFullYear() === now.getFullYear() &&
+                lastSeen.getMonth() === now.getMonth() &&
+                lastSeen.getDate() === now.getDate()
+            ) {
+                return `Hoje, às ${timeStr}`;
+            }
+
+            const yesterday = new Date(now);
+            yesterday.setDate(now.getDate() - 1);
+            if (
+                lastSeen.getFullYear() === yesterday.getFullYear() &&
+                lastSeen.getMonth() === yesterday.getMonth() &&
+                lastSeen.getDate() === yesterday.getDate()
+            ) {
+                return `Ontem, às ${timeStr}`;
+            }
+
+            const monthNames = [
+                "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+                "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+            ];
+            const day = lastSeen.getDate();
+            const month = monthNames[lastSeen.getMonth()];
+            return `${day} de ${month}, às ${timeStr}`;
+        }
+
+        document.querySelector('title').innerHTML = 'Xatto Web'
+
+        const ws = new WebSocket('ws://127.0.0.1:8000/chat/update-user-status/' + slug + '/')
+
+        ws.onmessage = (e) => {
+            const data = JSON.parse(e.data)
+
+            if (data.user_id && data.status) {
+                const statusElementHTML = document.getElementById(`status-${data.user_id}`)
+
+                if (statusElementHTML) {
+                    if (data.status === "on") {
+                        statusElementHTML.innerText = "Online"
+                        statusElementHTML.removeAttribute('data-last-seen');
+                    } else {
+                        if (data.last_seen) {
+                            statusElementHTML.setAttribute('data-last-seen', data.last_seen);
+                            statusElementHTML.innerText = formatDate(data.last_seen)
+                        } else {
+                            statusElementHTML.innerText = "Offline"
+
+                        }
+                    }
+
+                    statusElementHTML.style.color = data.status === "on" ? 'green' : '#333'
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loader.style.display = "none"
+
+            document.querySelectorAll('.js-offline-status')
+                .forEach(el => {
+                    el.innerText = formatDate(el.innerText)
+                })
+
+            updateOfflineStatuses()
+            setInterval(updateOfflineStatuses, 60000)
+        })
+
+        function updateOfflineStatuses() {
+            const offlineElements = document.querySelectorAll('[data-last-seen]');
+            offlineElements.forEach(el => {
+                const lastSeenStr = el.getAttribute('data-last-seen');
+                if (lastSeenStr) {
+                    el.innerText = formatDate(lastSeenStr);
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

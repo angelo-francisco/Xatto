@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_list_or_404, get_object_or_404, redirect, render
 from django.urls import reverse
 
-from .models import Contact, Room
+from .models import Contact, Message, Room
 
 User = get_user_model()
 
@@ -89,6 +89,9 @@ def create_room(request):
 def chat_room(request, slug):
     ctx = {}
     room = get_object_or_404(Room, slug=slug)
+    messages = get_list_or_404(Message, room=room)
 
-    ctx["slug"] = slug
+    ctx["chat"] = room
+    ctx["user_slug"] = request.user.slug
+    ctx["messages"] = messages
     return render(request, "chat/room.html", ctx)

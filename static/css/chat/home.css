@@ -123,10 +123,18 @@ main {
 }
 
 .avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: #dfe5e7;
+    background: #efeeeea3;
+}
+
+.avatar img {
+    width: 50px;
+    height: auto;
 }
 
 .chat-info {

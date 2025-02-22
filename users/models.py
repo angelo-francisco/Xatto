@@ -1,7 +1,9 @@
 import uuid
+from datetime import timedelta
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 from .choices import StatusChoices
 
@@ -31,3 +33,5 @@ class User(AbstractUser):
     slug = models.SlugField(
         unique=True, default=uuid.uuid4, editable=False, null=True, blank=True
     )
+    updated_at = models.DateTimeField(auto_now=True)
+    

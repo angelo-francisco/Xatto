@@ -1,12 +1,44 @@
 {% for chat in chats %}
-<div class="chat-item">
-    <div class="avatar"></div>
+<div class="chat-item" hx-get="{% url 'chat-room' chat.slug %}" hx-trigger="click delay:100ms" hx-target="#main-section">
+    <div class="avatar">
+        {% if not chat.is_private %}
+        <img src="{{ chat.image.url }}">
+        {% else %}
+            {% for member in chat.participants.all %}
+                {% if member != request.user %}
+                    <img src="{{ member.photo.url }}">
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+        
     <div class="chat-info">
-        <h4></h4>
-        <p>Última mensagem recebida...</p>
+        {% if not chat.is_private %}
+            <h4>{{ chat.name }}</h4>
+        {% else %}
+            {% for member in chat.participants.all %}
+                {% if member != request.user %}
+                    <h4>{{ member.username }}</h4>
+                    <p id="status-{{member.id}}" 
+                        {% if member.status == "on" %}
+                            style="color: green;"
+                        {% else %}
+                            class="js-offline-status"
+                            style="color: #333;"
+                        {% endif %}
+                    >
+                    {% if member.status == "on" %}
+                        {{ member.get_status_display }}
+                    {% else %}
+                        {{ member.updated_at|date:"c" }}
+                    {% endif %}
+                </p>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     </div>
     <div class="chat-meta">
-        <span>15:30</span>
+        <span>{{ chat.uploaded_at|date:"h:i" }}</span>
         <div class="unread-count">2</div>
     </div>
 </div>

@@ -19,12 +19,14 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 INSTALLED_APPS = [
     "daphne",
+    "livereload",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
     "ninja",
     "chat",
     "users",
@@ -38,6 +40,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "livereload.middleware.LiveReloadScript",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -77,7 +80,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -100,9 +102,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "pt-BR"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Africa/Luanda"
 
 USE_I18N = True
 
@@ -135,4 +137,3 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
