@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from ninja import NinjaAPI
 
 from .models import Contact
-from .utils import get_something
 
 api = NinjaAPI(
     title="Chat Application API Gateway",
@@ -12,9 +11,16 @@ api = NinjaAPI(
 User = get_user_model()
 
 
+def get_user(**kwargs):
+    try:
+        return User.objects.get(**kwargs)
+    except User.DoesNotExist:
+        return None
+
+
 @api.get("/get-contacts/{slug}")
 def get_user_contacts(request, slug: str):
-    user = get_something(User, slug=slug)
+    user = get_user(slug=slug)
 
     if user is None:
         return JsonResponse({"error": "User not found"}, status=404)
@@ -29,11 +35,8 @@ def get_user_contacts(request, slug: str):
 
 @api.get("/get-or-create-contact/{slug}/{contact_username}")
 def get_or_create_contacts(request, slug: str, contact_username: str):
-    """
-    Get the contacts of user, and if user is doesn't ext
-    """
-    user = get_something(User, slug=slug)
-    contact = get_something(User, username=contact_username)
+    user = get_user(slug=slug)
+    contact = get_user(username=contact_username)
 
     if user is None:
         return JsonResponse({"error": "User not found"}, status=404)
@@ -53,7 +56,8 @@ def get_or_create_contacts(request, slug: str, contact_username: str):
         {
             "contact__username": new_contact.contact.username,
             "contact__slug": new_contact.contact.slug,
-            "contact__photo": new_contact.contact.photo,
         },
         safe=False,
     )
+
+

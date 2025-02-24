@@ -59,19 +59,20 @@
 </div>
 
 <script>
-    const ws2 = new WebSocket('ws://127.0.0.1:8000/chat/chat-consumer/{{ chat.slug }}/{{ user_slug }}/');
-    const chatMessages = document.querySelector(".chat-messages");
-    const messageInput = document.getElementById('chat-message-input');
+    (function () {
+        const ws2 = new WebSocket('ws://127.0.0.1:8000/chat/chat-consumer/{{ chat.slug }}/{{ user_slug }}/');
+        const chatMessages = document.querySelector(".chat-messages");
+        const messageInput = document.getElementById('chat-message-input');
 
-    function parseTimestamp(timestamp) {
-        const date = new Date(timestamp);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
+        function parseTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
 
-    function createMessageElement(content, time, isSender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message-container ${isSender ? 'sent' : 'received'}`;
-        messageDiv.innerHTML = `
+        function createMessageElement(content, time, isSender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message-container ${isSender ? 'sent' : 'received'}`;
+            messageDiv.innerHTML = `
             <div class="message-bubble">
                 <p>${content}</p>
                 <div class="message-info">
@@ -79,56 +80,57 @@
                     </div>
                     </div>
                     `;
-        return messageDiv;
-    }
-
-    function sendMessage() {
-        const content = messageInput.value.trim();
-        if (!content) {
-            messageInput.classList.add('shake');
-            setTimeout(() => messageInput.classList.remove('shake'), 500);
-            return;
+            return messageDiv;
         }
 
-        if (ws2.readyState === WebSocket.OPEN) {
-            const message = {
-                content: content,
-                uuid: crypto.randomUUID()
-            };
+        function sendMessage() {
+            const content = messageInput.value.trim();
+            if (!content) {
+                messageInput.classList.add('shake');
+                setTimeout(() => messageInput.classList.remove('shake'), 500);
+                return;
+            }
 
-            ws2.send(JSON.stringify(message));
-            messageInput.value = '';
+            if (ws2.readyState === WebSocket.OPEN) {
+                const message = {
+                    content: content,
+                    uuid: crypto.randomUUID()
+                };
+
+                ws2.send(JSON.stringify(message));
+                messageInput.value = '';
+            }
         }
-    }
 
-    ws2.onmessage = (e) => {
-        const { content, timestamp, sender, uuid } = JSON.parse(e.data);
-        const time = parseTimestamp(timestamp);
-        const isSender = sender === "{{ request.user.username }}";
+        ws2.onmessage = (e) => {
+            const { content, timestamp, sender, uuid } = JSON.parse(e.data);
+            const time = parseTimestamp(timestamp);
+            const isSender = sender === "{{ request.user.username }}";
 
-        const messageElement = createMessageElement(content, time, isSender);
-        chatMessages.appendChild(messageElement);
+            const messageElement = createMessageElement(content, time, isSender);
+            chatMessages.appendChild(messageElement);
 
-        // Animação de entrada
-        messageElement.style.opacity = '0';
-        messageElement.style.transform = `translateY(${isSender ? '20px' : '-20px'})`;
+            // Animação de entrada
+            messageElement.style.opacity = '0';
+            messageElement.style.transform = `translateY(${isSender ? '20px' : '-20px'})`;
 
-        requestAnimationFrame(() => {
-            messageElement.style.transition = 'all 0.3s ease-out';
-            messageElement.style.opacity = '1';
-            messageElement.style.transform = 'translateY(0)';
-        });
+            requestAnimationFrame(() => {
+                messageElement.style.transition = 'all 0.3s ease-out';
+                messageElement.style.opacity = '1';
+                messageElement.style.transform = 'translateY(0)';
+            });
 
-        // Scroll automático suave
-        chatMessages.scrollTo({
-            top: chatMessages.scrollHeight,
-            behavior: 'smooth'
-        });
-    };
+            // Scroll automático suave
+            chatMessages.scrollTo({
+                top: chatMessages.scrollHeight,
+                behavior: 'smooth'
+            });
+        };
 
-    document.getElementById('js-chat-input-button').addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage());
-
+        // Event Listeners
+        document.getElementById('js-chat-input-button').addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage());
+    })
 </script>
 
 <style>

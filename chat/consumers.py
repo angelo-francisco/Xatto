@@ -1,29 +1,27 @@
+import asyncio
 import json
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 
 from .models import Message, Room
-from .utils import aget_something_by_slug
 
 User = get_user_model()
 
 
+@database_sync_to_async
+def get_something_by_slug(model, slug):
+    return get_object_or_404(model, slug=slug)
+
+
 class OnlineUserConsumer(AsyncWebsocketConsumer):
-    """
-    OnlineUserConsumer: AsyncWebsocketConsumer
-
-    This websocket consumer allows us to change the user status (online, offile).
-    When user connects it'll add user to the channel_group and set the status to "on",
-    when disconnected it'll be set to "off".
-    """
-
     async def connect(self):
         try:
             slug = self.scope["url_route"]["kwargs"]["slug"]
 
-            self.user = await aget_something_by_slug(User, slug)
+            self.user = await get_something_by_slug(User, slug)
             self.group_name = "online_users"
 
             await self.accept()
@@ -39,13 +37,12 @@ class OnlineUserConsumer(AsyncWebsocketConsumer):
                 },
             )
         except Exception as e:
-            print(e)
+            print(f"Erro ao conectar: {e}")
             await self.close()
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.group_name, self.channel_name)
-
         if hasattr(self, "user"):
+            await self.channel_layer.group_discard(self.group_name, self.channel_name)
             await self.update_user_status(self.user, "off")
             await self.channel_layer.group_send(
                 self.group_name,
@@ -60,6 +57,7 @@ class OnlineUserConsumer(AsyncWebsocketConsumer):
 
     async def user_status(self, event):
         try:
+            # await asyncio.sleep(1)
             await self.send(
                 text_data=json.dumps(
                     {
@@ -71,7 +69,7 @@ class OnlineUserConsumer(AsyncWebsocketConsumer):
                 )
             )
         except Exception as e:
-            print(e)
+            print("Error: ", e)
 
     @database_sync_to_async
     def update_user_status(self, user, status):
@@ -81,27 +79,21 @@ class OnlineUserConsumer(AsyncWebsocketConsumer):
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        try:
-            room_slug = self.scope["url_route"]["kwargs"]["room"]
-            from_slug = self.scope["url_route"]["kwargs"]["from"]
+        room_slug = self.scope["url_route"]["kwargs"]["room"]
+        from_slug = self.scope["url_route"]["kwargs"]["from"]
 
-            self.room = await aget_something_by_slug(Room, room_slug)
-            self.sender = await aget_something_by_slug(User, from_slug)
+        self.room = await get_something_by_slug(Room, room_slug)
+        self.sender = await get_something_by_slug(User, from_slug)
 
-            if not self.room or not self.sender:
-                await self.close()
-                return
+        if not self.room or not self.sender:
+            await self.close()
+            return
 
-            await self.channel_layer.group_add(self.room.slug, self.channel_name)
-            await self.accept()
-        except Exception as e:
-            print(e)
+        await self.channel_layer.group_add(self.room.slug, self.channel_name)
+        await self.accept()
 
     async def disconnect(self, close_data):
-        try:
-            await self.channel_layer.group_discard(self.room.slug, self.channel_name)
-        except Exception as e:
-            print(e)
+        await self.channel_layer.group_discard(self.room.slug, self.channel_name)
 
     async def receive(self, text_data):
         try:

@@ -1,16 +1,35 @@
-from django.contrib.auth import (
-    authenticate,
-    get_user_model,
-)
+from django.contrib.auth import authenticate
 from django.contrib.auth import login as dj_login
 from django.contrib.auth import logout as dj_logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
 from .forms import SignupForm
-from .utils import can_not_be_logged
 
 User = get_user_model()
+
+
+def can_not_be_logged(func):
+    def wrapper(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("home")
+        return func(request, *args, **kwargs)
+
+    return wrapper
+
+
+def check_username(request, username):
+    if User.objects.filter(username=username).exists():
+        return JsonResponse({"status": False})
+    return JsonResponse({"status": True})
+
+
+def check_email(request, email):
+    if User.objects.filter(email=email).exists():
+        return JsonResponse({"status": False})
+    return JsonResponse({"status": True})
 
 
 @can_not_be_logged
@@ -19,7 +38,7 @@ def signup(request):
 
     if request.method == "POST":
         form = SignupForm(request.POST)
-
+        
         if form.is_valid():
             form.save()
             return redirect("login")
@@ -48,4 +67,5 @@ def login(request):
 def logout(request):
     if request.method == "POST":
         dj_logout(request)
+
     return render(request, "users/logout.html")
