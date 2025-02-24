@@ -66,7 +66,9 @@ ASGI_APPLICATION = "core.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "hosts": [("127.0.0.1", 6380)],
+        "hosts": [
+            ("127.0.0.1", 6380),
+        ],
     }
 }
 
@@ -136,4 +138,3 @@ AUTHENTICATION_BACKENDS = [
     "users.backends.EmailBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
-
