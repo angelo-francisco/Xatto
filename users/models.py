@@ -1,14 +1,18 @@
 import uuid
-from datetime import timedelta
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils import timezone
 
 from .choices import StatusChoices
 
 
 class User(AbstractUser):
+    """
+    User -> Usuário
+
+    This entity represents the logged user.
+    """
+
     photo = models.ImageField(
         upload_to="profiles/",
         default="profiles/default.png",
@@ -34,4 +38,3 @@ class User(AbstractUser):
         unique=True, default=uuid.uuid4, editable=False, null=True, blank=True
     )
     updated_at = models.DateTimeField(auto_now=True)
-    
