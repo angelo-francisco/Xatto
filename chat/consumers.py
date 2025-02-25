@@ -15,6 +15,13 @@ def get_something_by_slug(model, slug):
     return get_object_or_404(model, slug=slug)
 
 
+# criar um consumer para o status do usuario
+# ele vai ser colocado na home, e vai verificar se o username da room aberta é igual ao username q esta on ou off agr
+# organizar codigo do projecto
+# SEPARAR HTML, CSS, E JS
+
+# consumer para as last_messages
+
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         try:

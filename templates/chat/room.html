@@ -1,39 +1,11 @@
 <style>
-  .bubble {
-      fill: #6c63ff;
-      opacity: 0.8;
-      animation: float 4s ease-in-out infinite;
-    }
-  
-    .bubble:nth-child(2) {
-      fill: #4e94f9;
-      animation-delay: 1s;
-    }
-    .bubble:nth-child(3) {
-      fill: #42d6a4;
-      animation-delay: 2s;
-    }
-    
-    @keyframes float {
-      0% {
-        transform: translateY(0);
-        opacity: 0.8;
-      }
-      50% {
-        transform: translateY(-20px);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 0.8;
-      }
-    }
   #div-first-msg {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
+
   :root {
     --primary: #4a9c7d;
     --primary-dark: #3a7d63;
@@ -101,13 +73,25 @@
   }
 
   .message-container {
-    max-width: 75%;
     opacity: 0;
     transform: translateY(20px);
+    max-width: fit-content;
+    /* Ajusta a largura ao conteúdo */
+    word-wrap: break-word;
+    /* Quebra palavras longas */
+    overflow-wrap: break-word;
+    /* Quebra palavras longas */
   }
 
   .message-container.sent {
     margin-left: auto;
+    max-width: 75%;
+    /* Mantém um tamanho maior para mensagens enviadas */
+  }
+
+  .message-container.received {
+    margin-right: auto;
+    /* Alinha mensagens recebidas à esquerda */
   }
 
   .message-bubble {
@@ -191,6 +175,7 @@
   }
 
   @keyframes shake {
+
     0%,
     100% {
       transform: translateX(0);
@@ -216,36 +201,34 @@
   }
 </style>
 
-
 <div class="chat-app">
   <div class="chat-header">
     <div class="header-content">
       {% if not chat.is_private %}
-        <img src="{{ chat.image.url }}" alt="Grupo" class="profile-pic group" />
+      <img src="{{ chat.image.url }}" alt="Grupo" class="profile-pic group" />
       {% else %}
-        {% for member in chat.participants.all %}
-          {% if member != request.user %}
-            <div class="user-profile">
-              <img src="{{ member.photo.url }}" alt="{{ member.username }}" class="profile-pic" />
-              <span class="status-dot"></span>
-            </div>
-          {% endif %}
-        {% endfor %}
+      {% for member in chat.participants.all %}
+      {% if member != request.user %}
+      <div class="user-profile">
+        <img src="{{ member.photo.url }}" alt="{{ member.username }}" class="profile-pic" />
+      </div>
+      {% endif %}
+      {% endfor %}
       {% endif %}
 
       <div class="user-info">
         {% if not chat.is_private %}
-          <h2 class="chat-title">{{ chat.name }}</h2>
-          <span class="members-count">{{ chat.participants.count }} membros</span>
+        <h2 class="chat-title">{{ chat.name }}</h2>
+        <span class="members-count">{{ chat.participants.count }} membros</span>
         {% else %}
-          {% for member in chat.participants.all %}
-            {% if member != request.user %}
-              <div class="user-status">
-                <h2 class="username" id="js-other-user-username">{{ member.username }}</h2>
-                <span class="status">{{ member.get_status_display }}</span>
-              </div>
-            {% endif %}
-          {% endfor %}
+        {% for member in chat.participants.all %}
+        {% if member != request.user %}
+        <div class="user-status">
+          <h2 class="username" id="js-other-user-username">{{ member.username }}</h2>
+          <span class="status" id="js-status">{{ member.get_status_display }}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
         {% endif %}
       </div>
     </div>
@@ -253,17 +236,52 @@
 
   <div class="chat-messages">
     {% for msg in messages %}
-      <div class="message-container {% if msg.sender == request.user %}sent{% else %}received{% endif %}">
-        <div class="message-bubble">
-          <p>{{ msg.content }}</p>
-          <div class="message-info">
-            <span class="time">{{ msg.timestamp|time:'H:i' }}</span>
-          </div>
+    <div class="message-container {% if msg.sender == request.user %}sent{% else %}received{% endif %}"
+      style="opacity: 1; transform: none;">
+      <div class="message-bubble">
+        <p>{{ msg.content }}</p>
+        <div class="message-info">
+          <span class="time">{{ msg.timestamp|time:'H:i' }}</span>
         </div>
+      </div>
     </div>
     {% empty %}
     <div id="div-first-msg">
       <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <style>
+          .bubble {
+            fill: #6c63ff;
+            opacity: 0.8;
+            animation: float 4s ease-in-out infinite;
+          }
+
+          .bubble:nth-child(2) {
+            fill: #4e94f9;
+            animation-delay: 1s;
+          }
+
+          .bubble:nth-child(3) {
+            fill: #42d6a4;
+            animation-delay: 2s;
+          }
+
+          @keyframes float {
+            0% {
+              transform: translateY(0);
+              opacity: 0.8;
+            }
+
+            50% {
+              transform: translateY(-20px);
+              opacity: 1;
+            }
+
+            100% {
+              transform: translateY(0);
+              opacity: 0.8;
+            }
+          }
+        </style>
         <circle class="bubble" cx="50" cy="150" r="15" />
         <circle class="bubble" cx="100" cy="160" r="10" />
         <circle class="bubble" cx="150" cy="140" r="12" />
@@ -288,81 +306,89 @@
 
 <script>
   function createMessageElement(content, time, isSender) {
-    return `
-      <div class="message-container ${isSender ? 'sent' : 'received'}">
-          <p>${content}</p>
-          <div class="message-info">
-              <span class="time">${time}</span>
-          </div>
-      </div>`
+    let m = document.createElement('div');
+    m.classList.add('message-container', isSender ? 'sent' : 'received');
+    m.innerHTML = `
+        <div class="message-bubble">
+            <p>${content}</p>
+            <div class="message-info">
+                <span class="time">${time}</span>
+            </div>
+        </div>`;
+    return m;
   }
 
   function parseTimestamp(timestamp) {
-    const date = new Date(timestamp)
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
   function loadRoom() {
-    const otherUserUsername = document.querySelector('#js-other-user-username').textContent
-    const firstMessage = document.querySelector('#first-message')
+    const otherUserUsername = document.querySelector('#js-other-user-username').textContent;
+    const firstMessage = document.querySelector('#first-message');
 
     if (firstMessage) {
-        firstMessage.innerText += ' ' + otherUserUsername
+      firstMessage.innerText += ' ' + otherUserUsername;
     }
-  
-    const ws2 = new WebSocket('ws://127.0.0.1:8000/chat/chat-consumer/{{ chat.slug }}/{{ request.user.slug }}/')
-    const chatMessages = document.querySelector('.chat-messages')
-    const messageInput = document.getElementById('chat-message-input')
-  
-  
-    
-  
+
+    const ws2 = new WebSocket('ws://127.0.0.1:8000/chat/chat-consumer/{{ chat.slug }}/{{ request.user.slug }}/');
+
+    const chatMessages = document.querySelector('.chat-messages');
+    const messageInput = document.getElementById('chat-message-input');
+
     function sendMessage() {
-      const content = messageInput.value.trim()
+      const content = messageInput.value.trim();
       if (!content) {
-        messageInput.classList.add('shake')
-        setTimeout(() => messageInput.classList.remove('shake'), 500)
-        return
+        messageInput.classList.add('shake');
+        setTimeout(() => messageInput.classList.remove('shake'), 500);
+        return;
       }
-  
+
       if (ws2.readyState === WebSocket.OPEN) {
         const message = {
           content: content,
-        }
-  
-        ws2.send(JSON.stringify(message))
-        messageInput.value = ''
+        };
+
+        ws2.send(JSON.stringify(message));
+        messageInput.value = '';
       }
     }
-  
+
     ws2.onmessage = (e) => {
-      console.log(JSON.parse(e.data))
-      const { type, content, timestamp, username } = JSON.parse(e.data)
-      const time = parseTimestamp(timestamp)
-      const isSender = username === '{{ request.user.username }}'
-  
-      const messageElement = createMessageElement(content, time, isSender)
-      chatMessages.appendChild(messageElement)
-  
-      // Animação de entrada
-      messageElement.style.opacity = '0'
-      messageElement.style.transform = `translateY(${isSender ? '20px' : '-20px'})`
-  
-      requestAnimationFrame(() => {
-        messageElement.style.transition = 'all 0.3s ease-out'
-        messageElement.style.opacity = '1'
-        messageElement.style.transform = 'translateY(0)'
-      })
-  
-      // Scroll automático suave
-      chatMessages.scrollTo({
-        top: chatMessages.scrollHeight,
-        behavior: 'smooth'
-      })
-    }
-  
-    // Event Listeners
-    document.getElementById('js-chat-input-button').addEventListener('click', sendMessage)
-    messageInput.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage())
+      const data = JSON.parse(e.data);
+      console.log(data);
+      if (data.type === "user-status") {
+        const statusHTML = document.querySelector("#js-status");
+
+        if (data.username !== "{{ request.user.username }}") {
+          statusHTML.innerText = data.status === "on" ? 'Online' : 'Offline';
+        }
+      } else {
+        const time = parseTimestamp(data.timestamp);
+        const isSender = data.username === "{{ request.user.username }}";
+
+        const messageElement = createMessageElement(data.content, time, isSender);
+        chatMessages.appendChild(messageElement);
+
+        messageElement.style.opacity = '0';
+        messageElement.style.transform = `translateY(${isSender ? '20px' : '-20px'})`;
+
+        requestAnimationFrame(() => {
+          messageElement.style.transition = 'all 0.3s ease-out';
+          messageElement.style.opacity = '1';
+          messageElement.style.transform = 'translateY(0)';
+        });
+
+        chatMessages.scrollTo({
+          top: chatMessages.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    };
+
+    document.getElementById('js-chat-input-button').addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage());
   }
+
+  loadRoom();
 </script>
