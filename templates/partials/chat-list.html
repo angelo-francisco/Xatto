@@ -1,54 +1,41 @@
 {% for chat in chats %}
-<div class="chat-item" hx-get="{% url 'chat-room' chat.slug %}" hx-trigger="click delay:100ms" hx-target="#main-section">
+  <div class="chat-item" hx-get="{% url 'chat-room' chat.slug %}" hx-trigger="click delay:100ms" hx-target="#main-section">
     <div class="avatar">
-        {% if not chat.is_private %}
-        <img src="{{ chat.image.url }}">
-        {% else %}
-            {% for member in chat.participants.all %}
-                {% if member != request.user %}
-                    <img src="{{ member.photo.url }}">
-                {% endif %}
-            {% endfor %}
-        {% endif %}
+      {% if not chat.is_private %}
+        <img src="{{ chat.image.url }}" />
+      {% else %}
+        {% for member in chat.participants.all %}
+          {% if member != request.user %}
+            <img src="{{ member.photo.url }}" />
+          {% endif %}
+        {% endfor %}
+      {% endif %}
     </div>
-        
+
     <div class="chat-info">
-        {% if not chat.is_private %}
-            <h4>{{ chat.name }}</h4>
-        {% else %}
-            {% for member in chat.participants.all %}
-                {% if member != request.user %}
-                    <h4>{{ member.username }}</h4>
-                    <p id="status-{{member.id}}" 
-                        {% if member.status == "on" %}
-                            style="color: green;"
-                        {% else %}
-                            class="js-offline-status"
-                            style="color: #333;"
-                        {% endif %}
-                    >
-                    {% if member.status == "on" %}
-                        {{ member.get_status_display }}
-                    {% else %}
-                        {{ member.updated_at|date:"c" }}
-                    {% endif %}
-                </p>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
+      {% if not chat.is_private %}
+        <h4>{{ chat.name }}</h4>
+      {% else %}
+        {% for member in chat.participants.all %}
+          {% if member != request.user %}
+            <h4>{{ member.username }}</h4>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      <p id="last-message">{{ chat.get_last_message }}</p>
     </div>
     <div class="chat-meta">
-        <span>{{ chat.uploaded_at|date:"h:i" }}</span>
-        <div class="unread-count">2</div>
+      <span>{{ chat.uploaded_at|date:'h:i' }}</span>
+      <div class="unread-count">2</div>
     </div>
-</div>
+  </div>
 {% empty %}
-<div style="width: 100%;
+  <div style="width: 100%;
     padding: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     color: gray;">
     <p>Comece um chat...</p>
-</div>
+  </div>
 {% endfor %}

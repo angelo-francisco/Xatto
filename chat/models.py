@@ -25,6 +25,19 @@ class Room(models.Model):
     image = models.ImageField(upload_to="room/", blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    last_message = models.ForeignKey(
+        "Message",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="room_set_like_last",
+    )
+
+    @property
+    def get_last_message(self):
+        if not self.last_message:
+            return "..."
+        return self.last_message.content[:25] + "..."
 
     def __str__(self):
         return (

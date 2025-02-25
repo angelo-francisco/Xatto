@@ -8,7 +8,7 @@ from django.views.generic import RedirectView
 urlpatterns = (
     [
         path("admin/", admin.site.urls),
-        path("chat/", include("chat.urls")),
+        path("", include("chat.urls")),
         path("auth/", include("users.urls")),
         path("", RedirectView.as_view(url=reverse_lazy("home"))),
     ]

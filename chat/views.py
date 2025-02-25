@@ -89,9 +89,8 @@ def create_room(request):
 def chat_room(request, slug):
     ctx = {}
     room = get_object_or_404(Room, slug=slug)
-    messages = get_list_or_404(Message, room=room)
+    messages = Message.objects.filter(room=room)
 
     ctx["chat"] = room
-    ctx["user_slug"] = request.user.slug
     ctx["messages"] = messages
     return render(request, "chat/room.html", ctx)
