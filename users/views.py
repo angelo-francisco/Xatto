@@ -65,7 +65,5 @@ def login(request):
 
 @login_required
 def logout(request):
-    if request.method == "POST":
-        dj_logout(request)
-
+    dj_logout(request)
     return render(request, "users/logout.html")

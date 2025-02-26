@@ -1,5 +1,12 @@
+{% load static %}
+
 {% for chat in chats %}
-  <div class="chat-item" hx-get="{% url 'chat-room' chat.slug %}" hx-trigger="click delay:100ms" hx-target="#main-section">
+  <div class="chat-item" 
+  hx-get="{% url 'chat-room' chat.slug %}" 
+  hx-trigger="click delay:100ms" 
+  hx-target="#main-section"
+  data-chat-slug="{{ chat.slug }}"
+  >
     <div class="avatar">
       {% if not chat.is_private %}
         <img src="{{ chat.image.url }}" />
@@ -39,3 +46,5 @@
     <p>Comece um chat...</p>
   </div>
 {% endfor %}
+
+<script src="{% static 'js/chat/chatList.js' %}"></script>

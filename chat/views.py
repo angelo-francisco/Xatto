@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest
-from django.shortcuts import get_list_or_404, get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from .models import Contact, Message, Room
@@ -25,7 +25,7 @@ def get_chat_list(request):
     chats = Room.objects.filter(participants=request.user)
 
     ctx["chats"] = chats
-    return render(request, "partials/chat-list.html", ctx)
+    return render(request, "partials/chatList.html", ctx)
 
 
 @login_required
@@ -57,12 +57,12 @@ def check_contact_status(request):
                 ctx["msg"] = "This contact already exists!"
             ctx["user_slug"] = target_user.slug
 
-    return render(request, "partials/contact_status.html", ctx)
+    return render(request, "partials/contactStatus.html", ctx)
 
 
 @login_required
 def add_contact(request):
-    return render(request, "partials/chat_add.html")
+    return render(request, "partials/chatAdd.html")
 
 
 @login_required

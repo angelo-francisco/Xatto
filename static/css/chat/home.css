@@ -15,13 +15,14 @@
 }
 
 body {
+    height: 100vh;
     overflow: hidden;
     background: #f0f2f5;
-    height: 100vh;
 }
 
 main {
     display: flex;
+    width: 100%;
     height: 100vh;
     background: var(--background-light);
 }

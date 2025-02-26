@@ -19,17 +19,4 @@
     </div>
 </div>
 
-<script>
-    const link = document.createElement('link')
-
-    link.setAttribute('rel', 'stylesheet')
-    link.setAttribute('href', "{% static 'css/chat/add-contact.css' %}")
-
-    document.querySelector('head').appendChild(link)
-
-    const usernameInput = document.getElementById('username');
-
-    usernameInput.addEventListener('input', (event) => {
-        usernameInput.value = event.target.value.replace(' ', '');
-    });
-</script>
+<script src="{% static 'js/chat/chatAdd.js' %}"></script>
