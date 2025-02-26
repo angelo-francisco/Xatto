@@ -89,8 +89,8 @@ def create_room(request):
 def chat_room(request, slug):
     ctx = {}
     room = get_object_or_404(Room, slug=slug)
-    messages = Message.objects.filter(room=room).order_by('-timestamp')
-    print(messages)
+    messages = Message.objects.filter(room=room).order_by('timestamp')
+
     ctx["chat"] = room
     ctx["messages"] = messages
     return render(request, "chat/room.html", ctx)

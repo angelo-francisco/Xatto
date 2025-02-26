@@ -62,7 +62,7 @@
         </div>
       </div>
       <div class="chat-list" hx-get="{% url 'chat-list' %}" hx-trigger="listenForChatListUpdate from:body" hx-target="this" hx-swap="innerHTML">
-        {% include 'partials/chat-list.html' %}
+        {% include 'partials/chatList.html' %}
       </div>
     </section>
     <section class="main-chat-area" id="main-section">
