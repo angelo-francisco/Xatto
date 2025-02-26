@@ -298,3 +298,213 @@ main {
         transform: rotate(360deg);
     }
 }
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+        padding: 10px 0;
+    }
+
+    .logo {
+        width: 30px;
+    }
+
+    .logo-text {
+        font-size: 12px;
+    }
+
+    .nav-item {
+        padding: 8px;
+    }
+
+    .chat-list-container {
+        width: 100%;
+    }
+
+    .chat-list-header {
+        padding: 10px;
+    }
+
+    .chat-item {
+        padding: 8px;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .chat-info h4 {
+        font-size: 14px;
+    }
+
+    .chat-info p {
+        font-size: 12px;
+    }
+
+    .main-chat-area {
+        display: none;
+    }
+
+    .empty-chat {
+        padding: 10px;
+    }
+
+    .main-logo {
+        width: 80px;
+    }
+
+    .empty-chat h2 {
+        font-size: 18px;
+    }
+
+    .empty-chat p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 50px;
+    }
+
+    .logo {
+        width: 25px;
+    }
+
+    .logo-text {
+        display: none;
+    }
+
+    .nav-item {
+        padding: 6px;
+    }
+
+    .chat-list-header {
+        padding: 8px;
+    }
+
+    .chat-item {
+        padding: 6px;
+    }
+
+    .avatar {
+        width: 35px;
+        height: 35px;
+    }
+
+    .chat-info h4 {
+        font-size: 12px;
+    }
+
+    .chat-info p {
+        font-size: 10px;
+    }
+
+    .empty-chat h2 {
+        font-size: 16px;
+    }
+
+    .empty-chat p {
+        font-size: 12px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .sidebar {
+        width: 100px;
+    }
+
+    .logo {
+        width: 50px;
+    }
+
+    .logo-text {
+        font-size: 16px;
+    }
+
+    .chat-list-container {
+        width: 400px;
+    }
+
+    .chat-item {
+        padding: 16px;
+    }
+
+    .avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .chat-info h4 {
+        font-size: 18px;
+    }
+
+    .chat-info p {
+        font-size: 16px;
+    }
+
+    .empty-chat h2 {
+        font-size: 24px;
+    }
+
+    .empty-chat p {
+        font-size: 18px;
+    }
+}
+
+@media (orientation: portrait) {
+    main {
+        flex-direction: column;
+        /* Mudar a direção do layout para coluna em modo retrato */
+    }
+
+    .sidebar {
+        width: 100%;
+        /* Ajustar a largura da barra lateral para ocupar toda a largura */
+        height: 60px;
+        /* Reduzir a altura da barra lateral */
+        flex-direction: row;
+        /* Mudar a direção dos itens da barra lateral para linha */
+        justify-content: space-around;
+        /* Distribuir os itens da barra lateral */
+        padding: 10px;
+        /* Reduzir o padding */
+    }
+
+    .logo-container {
+        margin-bottom: 0;
+        /* Remover a margem inferior do contêiner do logo */
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        /* Mudar a direção dos itens de navegação para linha */
+        gap: 10px;
+        /* Reduzir o espaçamento entre os itens de navegação */
+    }
+
+    .chat-list-container {
+        width: 100%;
+        /* Ajustar a largura do contêiner da lista de chats para ocupar toda a largura */
+    }
+
+    .main-chat-area {
+        display: none;
+        /* Ocultar a área de chat principal em modo retrato */
+    }
+}
+
+@media (orientation: landscape) {
+    .sidebar {
+        width: 80px; /* Manter a largura da barra lateral em modo paisagem */
+    }
+
+    .chat-list-container {
+        width: 300px; /* Ajustar a largura do contêiner da lista de chats em modo paisagem */
+    }
+
+    .main-chat-area {
+        display: flex; /* Exibir a área de chat principal em modo paisagem */
+    }
+}
